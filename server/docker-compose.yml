@@ -1,0 +1,28 @@
+services:
+  app:
+    build: .
+    container_name: usermanagement_app
+    expose:
+      - "4001"
+    ports:
+      - "4001:4001"
+    env_file:
+      - .env
+    networks:
+      - shared-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.usermanagement.rule=Host(`usermanagement.ahmadfiqrioemry.com`)"
+      - "traefik.http.services.usermanagement.loadbalancer.server.port=4001"
+      - "traefik.http.routers.usermanagement.entrypoints=websecure"
+      - "traefik.http.routers.usermanagement.tls.certresolver=letsencrypt"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4001/health"]
+      interval: 45s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+networks:
+  shared-net:
+    external: true
